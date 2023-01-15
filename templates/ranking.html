@@ -1,0 +1,23 @@
+<div class="container mt-2">
+  <!-- <h2>Gene Ranking</h2> -->
+  <!-- <p>You can use any of the contextual classes to only add a color to the table header:</p> -->
+  <a style="float:right !important;" href="{{path}}" download><i class="fa fa-download"></i> Download</a><br><br>
+  <table class="table">
+    <thead class="table-dark">
+      <tr>
+        {% for column in columns %}
+        <th>{{column}}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        {% for col in row %}
+        <td>{{col}}</td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>MultiCens</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="static/img/favicon.ico">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://kit.fontawesome.com/b20b121063.js" crossorigin="anonymous"></script>
+    <style>
+        .help{
+        /*background-image: url('static/img/manual.webp');*/
+        background-repeat: no-repeat;
+        background-size: contain;
+        background-position: bottom;
+        border-left: 1px solid lightgrey;
+        }
+        ul li {
+            background-color: transparent !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container-fluid p-2 bg-primary text-white">
+        <div class="row">
+            <div class="col-md-1">
+                <img src="static/img/iitm.png" height="100px" alt="">
+            </div>
+            <div class="col-md-11">
+                <h1>MultiCens</h1>
+                <p>Multilayer network centrality measures to uncover molecular mediators of tissue-tissue communication.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs m-4">
+        <li class="nav-item">
+            <a class="nav-link active" data-bs-toggle="tab" href="#home"><i class="fa fa-home"></i> Home</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#tool"><i class="fa fa-screwdriver-wrench"></i> Tool</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#help"><i class="fa fa-circle-question"></i> Help</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#contact"><i class="fa fa-address-book"></i> Contact</a>
+        </li>
+    </ul>
+    
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <div class="tab-pane container active" id="home">
+            <div class="card mt-3 mb-3">
+                <h5 class="card-header">About</h5>
+                <div class="card-body">
+                    <p class="text-justify">
+                        MultiCens is platform from where users can predict hormone-responsive genes in a target tissue by providing the inputs such as Source and target tissue names, the mediator hormone, and the list of genes from source and the target tissues. The tool will take the list of genes from the source tissue and will rank the hormone-responsive genes from the target tissue gene list by their responsiveness for the selected hormone. <br><br>
+                        Please switch to the <dfn>Tool</dfn> tab to use the tool, provide the required inputs, by selecting the source and target tissue name, and hormone name from the dropdowns and you can download the sample csv files from the bottom-right corner of the <dfn>Tool</dfn> tab and then browse them from the browse option for source and target gene list. Finally, click the <dfn>Get Ranking </dfn> button to get the ranking. It will take a few (3-5) minutes to produce the results as it using very large correaltion matrices in the backend. After processing it will display the ranking of the genes in the form of a table as shown below:<br><br>
+
+                        <img style="width: 80%;margin-left:auto;margin-right:auto;display:block;" src="static/img/ranking.png" alt=""><br><br>
+                    For more details please switch to the <dfn>Help</dfn> tab Or You can contact us by switching to the <dfn>Contact</dfn> tab.
+
+                    </p>
+                </div>
+            </div>
+            <div class="card mt-3 mb-3">
+                <h5 class="card-header">References</h5>
+                <div class="card-body">
+                    <p>
+                        Kumar, Tarun, et al. "<dfn>MultiCens</dfn> Multilayer network centrality measures to uncover molecular mediators of tissue-tissue communication." bioRxiv (2022).
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane container fade" id="tool">
+            <div class="row">
+                <div class="col-sm-9">
+                    <div class="container ps-5 pe-5">        
+                        <button type="button" class="btn btn-outline-primary mb-3" id="sample-run"> Run Sample</button>
+                        <form action="" enctype="multipart/form-data" method="post" id="input-form">
+                            <div class="row">
+                                <div class="col">
+                                    <label for="source_tissue" class="form-label">Select Source Tissue</label>
+                                    <select class="form-select" id="source_tissue" name="source_tissue" required>
+                                        {% for tissue in tissue_list %}
+                                            <option value="{{tissue}}">{{tissue.capitalize()}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col">
+                                    <label for="target_tissue" class="form-label">Select Target Tissue</label>
+                                    <select class="form-select" id="target_tissue" name="target_tissue" required>
+                                        {% for tissue in tissue_list %}
+                                            <option value="{{tissue}}">{{tissue.capitalize()}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-3 mt-3">
+                                <label for="hormone" class="form-label">Select Hormone</label>
+                                    <select class="form-select" id="hormone" name="hormone" required>
+                                        {% for hormone in hormone_list %}
+                                            <option value="{{hormone}}">{{hormone.capitalize()}}</option>
+                                        {% endfor %}
+                                    </select>
+                            </div>
+                            <div class="mb-3 mt-3">
+                                <label for="input1" class="form-label">Source Gene Query Set</label>
+                                <input type="file" class="form-control" id="input1" name="input1" accept=".csv" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="pwd" class="form-label">Target Gene Query Set</label>
+                                <input type="file" class="form-control" id="input2" name="input2"  accept=".csv" required>
+                            </div>
+                            <button id="submit" type="submit" class="btn btn-primary">Get Ranking</button>
+                        </form>
+                    </div>
+                
+                    <div id="output" style="margin-top: 20px;font-size: large;" class="container-fluid p-5 text-center">
+                
+                    </div>
+                </div>
+                <div class="col-sm-3 p-4 mb-4 mt-5 bg-white border-left help">
+                    <h5><i class="fa fa-circle-info"></i> How to use</h5>
+                    <ul class="list-group list-group-flush bg-transparent">
+                        <li class="list-group-item">
+                            <strong>Step 1:</strong> Select the source and target tissue.
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Step 2:</strong> Select hormone.
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Step 3:</strong> Select the csv files with source and target gene list.
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Step 4:</strong> Click <strong>Get Ranking</strong> button.
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Step 5:</strong> Scroll down to see the result.
+                        </li>
+                    </ul>
+                    <div class="container-fluid mt-5">
+                        <h5><i class="fa fa-download"></i> Downloads</h5>
+                        <a href="static/downloads/insulin_source_genes_full.csv" download><i class="fa fa-download"></i> Sample csv file for source genes.</a><br>
+                        <a href="static/downloads/insulin_target_genes_full.csv" download><i class="fa fa-download"></i> Sample csv file for target genes.</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane container fade" id="help">
+            <div class="card">
+                <h5 class="card-header">Form fields</h5>
+                <div class="card-body">
+                    <ol class="list-group list-group-numbered mt-3">
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                          <div class="ms-2 me-auto">
+                            <div class="fw-bold">Source Tissue</div>
+                            The source tissue for which we are selecting CSV file with gene list in the 4th field (CSV file field for source gene list) and want to predict hormone-responsive genes in a target tissue.
+                          </div>
+                          <!-- <span class="badge bg-primary rounded-pill">14</span> -->
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                          <div class="ms-2 me-auto">
+                            <div class="fw-bold">Target Tissue</div>
+                            The target tissue for which we are selecting CSV file with a gene list in the 5th field (CSV file field for target gene list) and want to predict hormone-responsive genes inside.
+                          </div>
+                          <!-- <span class="badge bg-primary rounded-pill">14</span> -->
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                          <div class="ms-2 me-auto">
+                            <div class="fw-bold">Hormone</div>
+                            The mediating hormone between the source and the target tissue.
+                          </div>
+                          <!-- <span class="badge bg-primary rounded-pill">14</span> -->
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <div class="ms-2 me-auto">
+                              <div class="fw-bold">CSV file with source gene list</div>
+                              The list of genes from the source tissue for which we want to predict selected hormone-responsive genes in the target tissue.
+                            </div>
+                            <!-- <span class="badge bg-primary rounded-pill">14</span> -->
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <div class="ms-2 me-auto">
+                              <div class="fw-bold">CSV file with target gene list</div>
+                              The list of genes from the target tissue for which we want to predict selected hormone-responsive gene ranking.
+                            </div>
+                            <!-- <span class="badge bg-primary rounded-pill">14</span> -->
+                        </li>
+                    </ol>                  
+                </div>
+            </div>
+            <div class="card mt-3 mb-3">
+                <h5 class="card-header">Sample CSV files</h5>
+                <div class="card-body">
+                    <a href="static/downloads/insulin_source_genes_full.csv" download><i class="fa fa-download"></i> Sample csv file for source genes.</a><br>
+                    <a href="static/downloads/insulin_target_genes_full.csv" download><i class="fa fa-download"></i> Sample csv file for target genes.</a>               
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane container fade" id="contact">  
+            <div class="row row-cols-1 row-cols-sm-4 g-4 mt-3">
+                <div class="col">
+                  <div class="card h-100">
+                    <img src="static/img/avatar2.png" class="card-img-top" alt="Photo">
+                    <div class="card-body">
+                      <h5 class="card-title">Prof. Manikandan Narayanan</h5>
+                      <p class="card-text">
+                        Associate Professor, <br>
+                        Dept. of Computer Science & Engg,<br>
+                        Indian Institute of Technology Madras,<br>
+                        Email: nmanik@cse.iitm.ac.in
+                    </p>
+                    </div>
+                  </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100">
+                      <img src="static/img/avatar1.png" class="card-img-top" alt="Photo">
+                      <div class="card-body">
+                        <h5 class="card-title">Tarun Kumar</h5>
+                        <p class="card-text">
+                          Intel PhD fellow,<br>
+                          Dept. of Computer Science & Engg,<br>
+                          Indian Institute of Technology Madras,<br>
+                          Email: cs15d017@cse.iitm.ac.in
+                      </p>
+                      </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100">
+                      <img src="static/img/avatar3.png" class="card-img-top" alt="Photo">
+                      <div class="card-body">
+                        <h5 class="card-title">Sanga Mitra</h5>
+                        <p class="card-text">
+                          Project Associate, <br>
+                          Dept. of Computer Science & Engg,<br>
+                          Indian Institute of Technology Madras,<br>
+                          Email: 011141@imail.iitm.ac.in
+                      </p>
+                      </div>
+                    </div>
+                </div> 
+                <div class="col">
+                    <div class="card h-100">
+                      <img src="static/img/avatar1.png" class="card-img-top" alt="Photo">
+                      <div class="card-body">
+                        <h5 class="card-title">Ravi Kumar</h5>
+                        <p class="card-text">
+                          M.Tech. Student, <br>
+                          Dept. of Computer Science & Engg,<br>
+                          Indian Institute of Technology Madras,<br>
+                          Email: cs20m052@smail.iitm.ac.in
+                      </p>
+                      </div>
+                    </div>
+                </div>
+              </div>
+        </div>
+    </div>
+
+    <nav class="navbar navbar-dark bg-primary bg-primary mt-5">
+        <div class="container-fluid">
+          <span class="navbar-text text-center">
+            Bioinformatics and Integrative Data Science (BIRDS) Lab.
+          </span>
+        </div>
+    </nav>
+    <script src="/static/js/ranking.js"></script>
+
+</body>
+
+</html>
