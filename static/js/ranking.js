@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // input1.value = 'insulin_source_genes_full.csv';
       // input2.value = 'insulin_target_genes_full.csv';
 
-      outputDiv.innerHTML = '<img style="display:block;margin-left: auto;margin-right: auto;" height="150px" src="static/img/dna.gif"/><br/> Processing . . . ';
+      outputDiv.innerHTML = '<img style="display:block;margin-left: auto;margin-right: auto;" height="150px" src="static/img/dna.gif"/><br/>  Please wait! It may take 3-5 minutes ...';
 
       var xhr = new XMLHttpRequest();
         xhr.open('GET', '/run_sample', true);    
@@ -28,6 +28,11 @@ document.addEventListener('DOMContentLoaded', () => {
         xhr.onload = function () {
           if (xhr.status === 200) {
             outputDiv.innerHTML = xhr.responseText;
+            $('#ranking').DataTable({'columnDefs': [
+              { className: 'dt-center', targets: '_all' },
+                ],
+                'order': [2, 'asc'],
+            });
           } else {
             outputDiv.innerHTML = 'An error occurred during the upload. Try again.';
           }
@@ -40,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     form.onsubmit = function(event) {
         event.preventDefault();
 
-        outputDiv.innerHTML = '<img style="display:block;margin-left: auto;margin-right: auto;" height="150px" src="static/img/dna.gif"/><br/> Processing . . . ';
+        outputDiv.innerHTML = '<img style="display:block;margin-left: auto;margin-right: auto;" height="150px" src="static/img/dna.gif"/><br/> Please wait! It may take 3-5 minutes ...';
 
         var file1 = document.getElementById('input1').files[0];
         var file2 = document.getElementById('input2').files[0];
@@ -68,6 +73,11 @@ document.addEventListener('DOMContentLoaded', () => {
         xhr.onload = function () {
           if (xhr.status === 200) {
             outputDiv.innerHTML = xhr.responseText;
+            $('#ranking').DataTable({'columnDefs': [
+                    { className: 'dt-center', targets: '_all' },
+                ],
+                'order': [2, 'asc'],
+            });
           } else {
             outputDiv.innerHTML = 'An error occurred during the upload. Try again.';
           }

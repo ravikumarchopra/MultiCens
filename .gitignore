@@ -1,4 +1,9 @@
+/.vscode
 /__pycache__
-/insulin_responding_results_corr_SNAP.svg
 /data
 /env
+/dataset
+/output
+/uploads
+/static/downloads
+/static/uploads

@@ -3,36 +3,87 @@
 
 <head>
     <title>MultiCens</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" type="image/x-icon" href="static/img/favicon.ico">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/x-icon" href="static/img/favicon.ico" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://kit.fontawesome.com/b20b121063.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"
+        integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.css" />
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
     <style>
-        .help{
-        /*background-image: url('static/img/manual.webp');*/
-        background-repeat: no-repeat;
-        background-size: contain;
-        background-position: bottom;
-        border-left: 1px solid lightgrey;
+        .help {
+            /*background-image: url('static/img/manual.webp');*/
+            background-repeat: no-repeat;
+            background-size: contain;
+            background-position: bottom;
+            border-left: 1px solid lightgrey;
         }
+
         ul li {
             background-color: transparent !important;
+        }
+
+        .dataTables_filter {
+            margin-bottom: 10px;
+        }
+
+        table.dataTable thead th,
+        table.dataTable thead td {
+            padding: 6px !important;
+        }
+
+        table.dataTable thead th,
+        table.dataTable thead td,
+        table.dataTable tfoot th,
+        table.dataTable tfoot td {
+            text-align: center;
+        }
+
+        table.dataTable tbody th,
+        table.dataTable tbody td {
+            padding: 8px 8px;
+            text-overflow: ellipsis;
+        }
+
+        input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+        }
+
+        td button {
+            display: block;
+            margin: 0 auto;
+        }
+
+        .invalid-feedback {
+            display: none;
+            width: 100%;
+            margin-top: 0.25rem;
+            font-size: 0.875em;
+            color: #dc3545;
+        }
+
+        .centered-image {
+            display: inline-block;
         }
     </style>
 </head>
 
 <body>
-
     <div class="container-fluid p-2 bg-primary text-white">
         <div class="row">
             <div class="col-md-1">
-                <img src="static/img/iitm.png" height="100px" alt="">
+                <img src="static/img/iitm.png" height="100px" alt="" />
             </div>
             <div class="col-md-11">
                 <h1>MultiCens</h1>
-                <p>Multilayer network centrality measures to uncover molecular mediators of tissue-tissue communication.</p>
+                <p>
+                    Multilayer network centrality measures to uncover molecular
+                    mediators of tissue-tissue communication.
+                </p>
             </div>
         </div>
     </div>
@@ -43,7 +94,12 @@
             <a class="nav-link active" data-bs-toggle="tab" href="#home"><i class="fa fa-home"></i> Home</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="tab" href="#tool"><i class="fa fa-screwdriver-wrench"></i> Tool</a>
+            <a class="nav-link" data-bs-toggle="tab" href="#tool"><i class="fa fa-screwdriver-wrench"></i> Tool v1.0</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#tool-beta"><i class="fa fa-screwdriver-wrench"></i> Tool
+                v2.0
+                (beta)</a>
         </li>
         <li class="nav-item">
             <a class="nav-link" data-bs-toggle="tab" href="#help"><i class="fa fa-circle-question"></i> Help</a>
@@ -52,20 +108,88 @@
             <a class="nav-link" data-bs-toggle="tab" href="#contact"><i class="fa fa-address-book"></i> Contact</a>
         </li>
     </ul>
-    
+
     <!-- Tab panes -->
-    <div class="tab-content">
+    <div class="tab-content mb-5">
         <div class="tab-pane container active" id="home">
             <div class="card mt-3 mb-3">
                 <h5 class="card-header">About</h5>
                 <div class="card-body">
                     <p class="text-justify">
-                        MultiCens is platform from where users can predict hormone-responsive genes in a target tissue by providing the inputs such as Source and target tissue names, the mediator hormone, and the list of genes from source and the target tissues. The tool will take the list of genes from the source tissue and will rank the hormone-responsive genes from the target tissue gene list by their responsiveness for the selected hormone. <br><br>
-                        Please switch to the <dfn>Tool</dfn> tab to use the tool, provide the required inputs, by selecting the source and target tissue name, and hormone name from the dropdowns and you can download the sample csv files from the bottom-right corner of the <dfn>Tool</dfn> tab and then browse them from the browse option for source and target gene list. Finally, click the <dfn>Get Ranking </dfn> button to get the ranking. It will take a few (3-5) minutes to produce the results as it using very large correaltion matrices in the backend. After processing it will display the ranking of the genes in the form of a table as shown below:<br><br>
-
-                        <img style="width: 80%;margin-left:auto;margin-right:auto;display:block;" src="static/img/ranking.png" alt=""><br><br>
-                    For more details please switch to the <dfn>Help</dfn> tab Or You can contact us by switching to the <dfn>Contact</dfn> tab.
-
+                        <strong>MultiCens</strong> is platform from where we can predict
+                        hormone-responsive genes in a target tissue by providing the
+                        inputs such as Source and target tissue names, the mediator
+                        hormone, and the list of genes from source and the target tissues.
+                        The tool will take the list of genes from the source tissue and
+                        will rank the hormone-responsive genes from the target tissue gene
+                        list by their responsiveness for the selected hormone. And we can also measure the Centrality
+                        scores such as <strong><dfn>local centrality</dfn></strong>, <strong><dfn>global
+                                centrality</dfn></strong>, and <strong><dfn>query-set centrality</dfn></strong>.
+                    </p>
+                    <ol class="list-group list-group-numbered mt-3">
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">Local Centrality</div>
+                                A node in a layer (i.e. Tissue) can affect other nodes (i.e. genes) in the
+                                same layer as well as different layers. Local centrality captures the
+                                within-layer effect of a node.
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">Global Centrality</div>
+                                Local centrality considers the effect of only within-layer connections,
+                                Global centrality captures the remaining effect. The global centrality of a
+                                node is a measure of its influence on all nodes irrespective of their
+                                layers.
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">Query Set Centrality</div>
+                                Query-set centrality captures the effect of a node on a query-set of nodes
+                                present in any specific layer in the multilayer network.
+                            </div>
+                        </li>
+                    </ol><br /><br />
+                    <h5>Tool v1.0</h5>
+                    <p class="text-justify">
+                        Switch to the <dfn>Tool v1.0</dfn> tab to use the tool, provide
+                        the required inputs, by selecting the source and target tissue
+                        name, and hormone name from the dropdowns and you can download the
+                        sample csv files from the bottom-right corner of the
+                        <dfn>Tool</dfn> tab and then browse them from the browse option
+                        for source and target gene list. Finally, click the
+                        <dfn>Get Ranking </dfn> button to get the ranking. It will take a
+                        few (3-5) minutes to produce the results as it using very large
+                        correlation matrices in the backend. After processing it will
+                        display the ranking of the genes in the form of a table as shown
+                        below:<br /><br />
+                    <h6 style="text-align: center;">Sample Output for Tool v1.0</h6>
+                    <img style="
+                        width: 60%;
+                        margin-left: auto;
+                        margin-right: auto;
+                        display: block;
+                        " src="static/img/result1.png" alt="Sample Output for Tool v1.0" /><br />
+                    <h5>Tool v2.0 (beta)</h5>
+                    <p class="text-justify">
+                        Using <strong>Tool v2.0</strong>, We can measure the centrality scores for genes such as
+                        <strong><dfn>local centrality</dfn></strong>, <strong><dfn>global
+                                centrality</dfn></strong>, and <strong><dfn>query-set centrality</dfn></strong> by using
+                        gene expression data from <a href="https://gtexportal.org/home/">GTex</a> dataset or by providing your own gene expression
+                        data for Tissues.<br /><br />
+                    </p>
+                    <h6 style="text-align: center;">Sample Output for Tool v2.0 (beta)</h6>
+                    <img style="
+                        width: 60%;
+                        margin-left: auto;
+                        margin-right: auto;
+                        display: block;
+                        " src="static/img/result2.png" alt="Sample Output for Tool v2.0 (beta)" />
+                    <br /><br />
+                    <strong>For more details please switch to the <dfn>Help</dfn> tab Or You
+                        can contact us by switching to the <dfn>Contact</dfn> tab.</strong>
                     </p>
                 </div>
             </div>
@@ -73,7 +197,9 @@
                 <h5 class="card-header">References</h5>
                 <div class="card-body">
                     <p>
-                        Kumar, Tarun, et al. "<dfn>MultiCens</dfn> Multilayer network centrality measures to uncover molecular mediators of tissue-tissue communication." bioRxiv (2022).
+                        Kumar, Tarun, et al. "<dfn>MultiCens</dfn> Multilayer network
+                        centrality measures to uncover molecular mediators of
+                        tissue-tissue communication." bioRxiv (2022).
                     </p>
                 </div>
             </div>
@@ -81,15 +207,19 @@
         <div class="tab-pane container fade" id="tool">
             <div class="row">
                 <div class="col-sm-9">
-                    <div class="container ps-5 pe-5">        
-                        <button type="button" class="btn btn-outline-primary mb-3" id="sample-run"> Run Sample</button>
+                    <div class="container ps-5 pe-5">
+                        <button type="button" class="btn btn-outline-primary mb-3" id="sample-run">
+                            Example Run
+                        </button>
                         <form action="" enctype="multipart/form-data" method="post" id="input-form">
                             <div class="row">
                                 <div class="col">
                                     <label for="source_tissue" class="form-label">Select Source Tissue</label>
                                     <select class="form-select" id="source_tissue" name="source_tissue" required>
                                         {% for tissue in tissue_list %}
-                                            <option value="{{tissue}}">{{tissue.capitalize()}}</option>
+                                        <option value="{{tissue}}">
+                                            {{tissue.capitalize()}}
+                                        </option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -97,33 +227,40 @@
                                     <label for="target_tissue" class="form-label">Select Target Tissue</label>
                                     <select class="form-select" id="target_tissue" name="target_tissue" required>
                                         {% for tissue in tissue_list %}
-                                            <option value="{{tissue}}">{{tissue.capitalize()}}</option>
+                                        <option value="{{tissue}}">
+                                            {{tissue.capitalize()}}
+                                        </option>
                                         {% endfor %}
                                     </select>
                                 </div>
                             </div>
                             <div class="mb-3 mt-3">
                                 <label for="hormone" class="form-label">Select Hormone</label>
-                                    <select class="form-select" id="hormone" name="hormone" required>
-                                        {% for hormone in hormone_list %}
-                                            <option value="{{hormone}}">{{hormone.capitalize()}}</option>
-                                        {% endfor %}
-                                    </select>
+                                <select class="form-select" id="hormone" name="hormone" required>
+                                    {% for hormone in hormone_list %}
+                                    <option value="{{hormone}}">
+                                        {{hormone.capitalize()}}
+                                    </option>
+                                    {% endfor %}
+                                </select>
                             </div>
                             <div class="mb-3 mt-3">
                                 <label for="input1" class="form-label">Source Gene Query Set</label>
-                                <input type="file" class="form-control" id="input1" name="input1" accept=".csv" required>
+                                <input type="file" class="form-control" id="input1" name="input1" accept=".csv"
+                                    required />
                             </div>
                             <div class="mb-3">
-                                <label for="pwd" class="form-label">Target Gene Query Set</label>
-                                <input type="file" class="form-control" id="input2" name="input2"  accept=".csv" required>
+                                <label for="input2" class="form-label">Target Gene Query Set</label>
+                                <input type="file" class="form-control" id="input2" name="input2" accept=".csv"
+                                    required />
                             </div>
-                            <button id="submit" type="submit" class="btn btn-primary">Get Ranking</button>
+                            <button id="submit" type="submit" class="btn btn-primary">
+                                Get Ranking
+                            </button>
                         </form>
                     </div>
-                
-                    <div id="output" style="margin-top: 20px;font-size: large;" class="container-fluid p-5 text-center">
-                
+
+                    <div id="output" style="margin-top: 20px; font-size: large" class="container-fluid p-5 text-center">
                     </div>
                 </div>
                 <div class="col-sm-3 p-4 mb-4 mt-5 bg-white border-left help">
@@ -136,145 +273,455 @@
                             <strong>Step 2:</strong> Select hormone.
                         </li>
                         <li class="list-group-item">
-                            <strong>Step 3:</strong> Select the csv files with source and target gene list.
+                            <strong>Step 3:</strong> Select the csv files with source and
+                            target gene list.
                         </li>
                         <li class="list-group-item">
-                            <strong>Step 4:</strong> Click <strong>Get Ranking</strong> button.
+                            <strong>Step 4:</strong> Click
+                            <strong>Get Ranking</strong> button.
                         </li>
                         <li class="list-group-item">
                             <strong>Step 5:</strong> Scroll down to see the result.
                         </li>
                     </ul>
                     <div class="container-fluid mt-5">
-                        <h5><i class="fa fa-download"></i> Downloads</h5>
-                        <a href="static/downloads/insulin_source_genes_full.csv" download><i class="fa fa-download"></i> Sample csv file for source genes.</a><br>
-                        <a href="static/downloads/insulin_target_genes_full.csv" download><i class="fa fa-download"></i> Sample csv file for target genes.</a>
+                        <h6>
+                            <i class="fa fa-download"></i> Sample files for
+                            <strong>Example Run</strong>
+                        </h6>
+                        <a href="static/downloads/insulin_source_genes_full.csv" download><i class="fa fa-download"></i>
+                            Sample csv file for source
+                            genes.</a><br />
+                        <a href="static/downloads/insulin_target_genes_full.csv" download><i class="fa fa-download"></i>
+                            Sample csv file for target
+                            genes.</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane container fade" id="tool-beta">
+            <div class="row">
+                <div class="col-sm-9">
+                    <div class="container ps-5 pe-5 mt-5">
+                        <button type="button" class="btn btn-outline-primary mb-4" id="example-run">
+                            Example Run
+                        </button>
+                        <div class="alert alert-info d-none" id="info">
+                            <strong>Info!</strong> Tissue has already been added to the
+                            list.
+                        </div>
+                        <div class="alert alert-primary d-none" id="error">
+                            <strong>Required!</strong> Please select at least one Tissue to measure the centrality.
+                        </div>
+                        <div class="table-responsive mb-3" id="tableDiv">
+                            <table class="table caption-top" id="global-table">
+                                <caption><strong>Tissue List</strong></caption>
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Select</th>
+                                        <th>Tissue Name</th>
+                                        <th>Dataset</th>
+                                        <th>File</th>
+                                        <th style="text-align: center">Remove</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tBody"></tbody>
+                            </table>
+                        </div>
+                        <!-- Add Tissue -->
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label for="global-tissue" class="form-label">Select Tissue Name</label>
+                                <input type="text" list="tissues" class="form-control" id="global-tissue"
+                                    name="global-tissue" placeholder="Type or Select Tissue Name" required />
+                                <datalist id="tissues">
+                                    {% for tissue in tissue_list %}
+                                    <option value="{{tissue.capitalize()}}">
+                                        {% endfor %}
+                                    </option>
+                                </datalist>
+                                <div class="invalid-feedback" id="invalid-tissue">
+                                    Please enter or select a tissue name.
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="global-dataset" class="form-label">Select Dataset</label>
+                                <select class="form-select" id="global-dataset" name="global-dataset" required>
+                                    {% for dataset in dataset_list %}
+                                    <option value="{{dataset}}">{{dataset}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="global-file" class="form-label">Select Gene Expression Data File</label>
+                                <input type="file" class="form-control" id="global-file" name="global-file"
+                                    accept=".zip,.gz" disabled />
+                                <div class="invalid-feedback" id="invalid-file">
+                                    Please select a compressed csv file containing gene expression data for
+                                    the selected tissue.
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <label for="global-add" class="form-label">
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                <button type="button" id="global-add" class="btn btn-outline-success">
+                                    <i class="fa fa-plus"></i> Add Tissue
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Centrality Measure -->
+                        <div class="mb-4 mt-3">
+                            <label for="measure" class="form-label">Select Centrality Measure</label>
+                            <select class="form-select" id="measure" name="measure" required>
+                                {% for key, measure in measures.items() %}
+                                <option value="{{key}}">{{measure}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <!-- Local Centrality -->
+                        <div class="row" id="local">
+                            <form action="" enctype="multipart/form-data" method="post" id="form-local">
+                                <!-- <div class="mb-4">
+                                    <label for="local-tissue" class="form-label">Select Tissue</label>
+                                    <select class="form-select" id="local-tissue" name="local-tissue" required>
+                                        {% for tissue in tissue_list %}
+                                        <option value="{{tissue}}">{{tissue.capitalize()}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div> -->
+                                <button id="submit" type="submit" class="btn btn-primary mt-2">
+                                    Get Ranking
+                                </button>
+                            </form>
+                        </div>
+                        <!-- Global Centrality -->
+                        <div class="row d-none" id="global">
+                            <form action="" enctype="multipart/form-data" method="post" id="form-global">
+                                <button id="submit" type="submit" class="btn btn-primary mt-2">
+                                    Get Ranking
+                                </button>
+                            </form>
+                        </div>
+                        <!-- Query Set Centrality -->
+                        <div class="row d-none" id="query">
+                            <form action="" enctype="multipart/form-data" method="post" id="form-query">
+                                <div class="row mb-3">
+                                    <div class="col-6">
+                                        <label for="query-tissue" class="form-label">Query Tissue Name</label>
+                                        <select class="form-select" id="query-tissue" name="query-tissue" required>
+                                            {% for tissue in tissue_list %}
+                                            <option value="{{tissue}}">
+                                                {{tissue.capitalize()}}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-6">
+                                        <label for="query-file" class="form-label">Gene Query Set</label>
+                                        <input type="file" class="form-control" id="query-file" name="query-file"
+                                            accept=".csv" required />
+                                    </div>
+                                </div>
+                                <button id="submit" type="submit" class="btn btn-primary mt-2">
+                                    Get Ranking
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div id="result" style="margin-top: 20px; font-size: large" class="container-fluid p-5 text-center">
+                    </div>
+                </div>
+
+                <!-- How to use -->
+                <div class="col-sm-3 p-4 mb-4 mt-5 bg-white border-left help" id="shelp">
+                    <h5><i class="fa fa-circle-info"></i> How to use</h5>
+                    <ul class="list-group list-group-flush bg-transparent">
+                        <li class="list-group-item">
+                            <strong>Step 1:</strong> Add tissues to the <strong>Tissue List</strong> to create the
+                            network by following the following steps:
+                            <ol class="list-group list-group-numbered list-group-flush text-justify">
+                                <li class="list-group-item">Select or type <strong>Tissue Name.</strong></li>
+                                <li class="list-group-item">Select dataset (default:<strong>GTex</strong>) from
+                                    <strong>Select Dataset</strong> dropdown. If you want to use your own gene
+                                    expression data, then select <strong>Others</strong> option.
+                                </li>
+                                <li class="list-group-item">If you selected <strong>Others</strong> option from
+                                    <strong>Dataset</strong> dropdown, Then select a compressed (<strong>.zip</strong>,
+                                    <strong>.gz</strong>) csv file.
+                                </li>
+                            </ol>
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Step 2:</strong> Select the Centrality Measure from <strong> Select Centrality
+                                Measure</strong> dropdown.
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Step 3:</strong> Click the <strong>Get Ranking </strong> button.
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Step 4:</strong> Please wait for <strong>3-5 min(s)</strong>.
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Step 5:</strong> Scroll down to see the results.
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Step 6:</strong> You can filter the results using <strong>Search</strong> option.
+                        </li>
+                    </ul>
+                    <div class="container-fluid mt-5">
+                        <h6><i class="fa fa-download"></i> Sample files used for <strong>Example Run</strong></h6>
+                        <ul class="list-group list-group-flush bg-transparent">
+                            <li class="list-group-item">
+                                <a href="static/downloads/Pancreas.zip" download><i class="fa fa-download"></i>
+                                    Pancreas.zip</a> (Compressed csv file containing gene expression data for Pancreas
+                                Tissue)
+                            </li>
+                            <li class="list-group-item">
+                                <a href="static/downloads/Pancreas.zip" download><i class="fa fa-download"></i>
+                                    Muscle.zip</a> (Compressed csv file containing gene expression data for Muscle
+                                Tissue)
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>
         </div>
         <div class="tab-pane container fade" id="help">
+            <h4>Tool v1.0</h4>
             <div class="card">
                 <h5 class="card-header">Form fields</h5>
                 <div class="card-body">
                     <ol class="list-group list-group-numbered mt-3">
                         <li class="list-group-item d-flex justify-content-between align-items-start">
-                          <div class="ms-2 me-auto">
-                            <div class="fw-bold">Source Tissue</div>
-                            The source tissue for which we are selecting CSV file with gene list in the 4th field (CSV file field for source gene list) and want to predict hormone-responsive genes in a target tissue.
-                          </div>
-                          <!-- <span class="badge bg-primary rounded-pill">14</span> -->
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-start">
-                          <div class="ms-2 me-auto">
-                            <div class="fw-bold">Target Tissue</div>
-                            The target tissue for which we are selecting CSV file with a gene list in the 5th field (CSV file field for target gene list) and want to predict hormone-responsive genes inside.
-                          </div>
-                          <!-- <span class="badge bg-primary rounded-pill">14</span> -->
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-start">
-                          <div class="ms-2 me-auto">
-                            <div class="fw-bold">Hormone</div>
-                            The mediating hormone between the source and the target tissue.
-                          </div>
-                          <!-- <span class="badge bg-primary rounded-pill">14</span> -->
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-start">
                             <div class="ms-2 me-auto">
-                              <div class="fw-bold">CSV file with source gene list</div>
-                              The list of genes from the source tissue for which we want to predict selected hormone-responsive genes in the target tissue.
+                                <div class="fw-bold">Source Tissue</div>
+                                The source tissue for which we are selecting CSV file with
+                                gene list in the 4th field (CSV file field for source gene
+                                list) and want to predict hormone-responsive genes in a target
+                                tissue.
                             </div>
                             <!-- <span class="badge bg-primary rounded-pill">14</span> -->
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-start">
                             <div class="ms-2 me-auto">
-                              <div class="fw-bold">CSV file with target gene list</div>
-                              The list of genes from the target tissue for which we want to predict selected hormone-responsive gene ranking.
+                                <div class="fw-bold">Target Tissue</div>
+                                The target tissue for which we are selecting CSV file with a
+                                gene list in the 5th field (CSV file field for target gene
+                                list) and want to predict hormone-responsive genes inside.
                             </div>
                             <!-- <span class="badge bg-primary rounded-pill">14</span> -->
                         </li>
-                    </ol>                  
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">Hormone</div>
+                                The mediating hormone between the source and the target
+                                tissue.
+                            </div>
+                            <!-- <span class="badge bg-primary rounded-pill">14</span> -->
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">CSV file with source gene list</div>
+                                The list of genes from the source tissue for which we want to
+                                predict selected hormone-responsive genes in the target
+                                tissue.
+                            </div>
+                            <!-- <span class="badge bg-primary rounded-pill">14</span> -->
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">CSV file with target gene list</div>
+                                The list of genes from the target tissue for which we want to
+                                predict selected hormone-responsive gene ranking.
+                            </div>
+                            <!-- <span class="badge bg-primary rounded-pill">14</span> -->
+                        </li>
+                    </ol>
                 </div>
             </div>
             <div class="card mt-3 mb-3">
                 <h5 class="card-header">Sample CSV files</h5>
                 <div class="card-body">
-                    <a href="static/downloads/insulin_source_genes_full.csv" download><i class="fa fa-download"></i> Sample csv file for source genes.</a><br>
-                    <a href="static/downloads/insulin_target_genes_full.csv" download><i class="fa fa-download"></i> Sample csv file for target genes.</a>               
+                    <a href="static/downloads/insulin_source_genes_full.csv" download><i class="fa fa-download"></i>
+                        Sample csv file for source
+                        genes.</a><br />
+                    <a href="static/downloads/insulin_target_genes_full.csv" download><i class="fa fa-download"></i>
+                        Sample csv file for target
+                        genes.</a>
+                </div>
+            </div>
+            <h4>Tool v2.0 (beta)</h4>
+            <div class="card">
+                <h5 class="card-header">Form fields</h5>
+                <div class="card-body">
+                    <ol class="list-group list-group-numbered mt-3">
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">Tissue List</div>
+                                The Tissue List contains the list of tissues we are using to build the network.
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">Tissue Name</div>
+                                Name of the Tissue.
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">Dataset</div>
+                                Dataset Name (by default, it will use <strong>GTex</strong> dataset). If you want to use
+                                your own gene expression data, then select <strong>Others</strong> option.
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">Gene Expression Data File</div>
+                                A compressed (<strong>.zip</strong>, <strong>.gz</strong>) csv file.
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">Centrality Measure</div>
+                                There are the following three Centrality Measures which we can use to measure the
+                                centrality of genes using the network we are creating for tissues from the
+                                <strong>Tissue List</strong>.
+                                <ol class="list-group list-group-numbered mt-3">
+                                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                                        <div class="ms-2 me-auto">
+                                            <div class="fw-bold">Local Centrality</div>
+                                            A node in a layer (i.e. Tissue) can affect other nodes (i.e. genes) in the
+                                            same layer as well as different layers. Local centrality captures the
+                                            within-layer effect of a node.
+                                        </div>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                                        <div class="ms-2 me-auto">
+                                            <div class="fw-bold">Global Centrality</div>
+                                            Local centrality considers the effect of only within-layer connections,
+                                            Global centrality captures the remaining effect. The global centrality of a
+                                            node is a measure of its influence on all nodes irrespective of their
+                                            layers.
+                                        </div>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                                        <div class="ms-2 me-auto">
+                                            <div class="fw-bold">Query Set Centrality</div>
+                                            Query-set centrality captures the effect of a node on a query-set of nodes
+                                            present in any specific layer in the multilayer network.
+                                        </div>
+                                    </li>
+                                </ol>
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">Gene Query Set</div>
+                                Gene query set is a csv file containing a list of genes for the query set that we will
+                                be using to measure the query set centrality.
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+            <div class="card mt-3 mb-3">
+                <h5 class="card-header">Sample files</h5>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush bg-transparent">
+                        <li class="list-group-item">
+                            <a href="static/downloads/Pancreas.zip" download><i class="fa fa-download"></i>
+                                Pancreas.zip</a> (Compressed csv file containing gene expression data for Pancreas
+                            Tissue)
+                        </li>
+                        <li class="list-group-item">
+                            <a href="static/downloads/Muscle.zip" download><i class="fa fa-download"></i>
+                                Muscle.zip</a> (Compressed csv file containing gene expression data for Muscle
+                            Tissue)
+                        </li>
+                        <li class="list-group-item">
+                            <a href="static/downloads/Pancreas.csv" download><i class="fa fa-download"></i>
+                                Pancreas.csv</a> (CSV file containing a list of genes from Pancreas Tissue)
+                        </li>
+                        <li class="list-group-item">
+                            <a href="static/downloads/Muscle.csv" download><i class="fa fa-download"></i>
+                                Muscle.csv</a> (CSV file containing a list of genes from Muscle Tissue)
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
-        <div class="tab-pane container fade" id="contact">  
+        <div class="tab-pane container fade" id="contact">
             <div class="row row-cols-1 row-cols-sm-4 g-4 mt-3">
                 <div class="col">
-                  <div class="card h-100">
-                    <img src="static/img/avatar2.png" class="card-img-top" alt="Photo">
-                    <div class="card-body">
-                      <h5 class="card-title">Prof. Manikandan Narayanan</h5>
-                      <p class="card-text">
-                        Associate Professor, <br>
-                        Dept. of Computer Science & Engg,<br>
-                        Indian Institute of Technology Madras,<br>
-                        Email: nmanik@cse.iitm.ac.in
-                    </p>
-                    </div>
-                  </div>
-                </div>
-                <div class="col">
                     <div class="card h-100">
-                      <img src="static/img/avatar1.png" class="card-img-top" alt="Photo">
-                      <div class="card-body">
-                        <h5 class="card-title">Tarun Kumar</h5>
-                        <p class="card-text">
-                          Intel PhD fellow,<br>
-                          Dept. of Computer Science & Engg,<br>
-                          Indian Institute of Technology Madras,<br>
-                          Email: cs15d017@cse.iitm.ac.in
-                      </p>
-                      </div>
+                        <img src="static/img/avatar2.png" class="card-img-top" alt="Photo" />
+                        <div class="card-body">
+                            <h5 class="card-title">Prof. Manikandan Narayanan</h5>
+                            <p class="card-text">
+                                Associate Professor, <br />
+                                Dept. of Computer Science & Engg,<br />
+                                Indian Institute of Technology Madras,<br />
+                                Email: nmanik@cse.iitm.ac.in
+                            </p>
+                        </div>
                     </div>
                 </div>
                 <div class="col">
                     <div class="card h-100">
-                      <img src="static/img/avatar3.png" class="card-img-top" alt="Photo">
-                      <div class="card-body">
-                        <h5 class="card-title">Sanga Mitra</h5>
-                        <p class="card-text">
-                          Project Associate, <br>
-                          Dept. of Computer Science & Engg,<br>
-                          Indian Institute of Technology Madras,<br>
-                          Email: 011141@imail.iitm.ac.in
-                      </p>
-                      </div>
-                    </div>
-                </div> 
-                <div class="col">
-                    <div class="card h-100">
-                      <img src="static/img/avatar1.png" class="card-img-top" alt="Photo">
-                      <div class="card-body">
-                        <h5 class="card-title">Ravi Kumar</h5>
-                        <p class="card-text">
-                          M.Tech. Student, <br>
-                          Dept. of Computer Science & Engg,<br>
-                          Indian Institute of Technology Madras,<br>
-                          Email: cs20m052@smail.iitm.ac.in
-                      </p>
-                      </div>
+                        <img src="static/img/avatar1.png" class="card-img-top" alt="Photo" />
+                        <div class="card-body">
+                            <h5 class="card-title">Tarun Kumar</h5>
+                            <p class="card-text">
+                                Intel PhD fellow,<br />
+                                Dept. of Computer Science & Engg,<br />
+                                Indian Institute of Technology Madras,<br />
+                                Email: cs15d017@cse.iitm.ac.in
+                            </p>
+                        </div>
                     </div>
                 </div>
-              </div>
+                <div class="col">
+                    <div class="card h-100">
+                        <img src="static/img/avatar3.png" class="card-img-top" alt="Photo" />
+                        <div class="card-body">
+                            <h5 class="card-title">Sanga Mitra</h5>
+                            <p class="card-text">
+                                Project Associate, <br />
+                                Dept. of Computer Science & Engg,<br />
+                                Indian Institute of Technology Madras,<br />
+                                Email: 011141@imail.iitm.ac.in
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100">
+                        <img src="static/img/avatar1.png" class="card-img-top" alt="Photo" />
+                        <div class="card-body">
+                            <h5 class="card-title">Ravi Kumar</h5>
+                            <p class="card-text">
+                                M.Tech. Student, <br />
+                                Dept. of Computer Science & Engg,<br />
+                                Indian Institute of Technology Madras,<br />
+                                Email: cs20m052@smail.iitm.ac.in
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <nav class="navbar navbar-dark bg-primary bg-primary mt-5">
         <div class="container-fluid">
-          <span class="navbar-text text-center">
-            Bioinformatics and Integrative Data Science (BIRDS) Lab.
-          </span>
+            <span class="navbar-text text-center">
+                Bioinformatics and Integrative Data Science (BIRDS) Lab, IITM.
+            </span>
         </div>
     </nav>
     <script src="/static/js/ranking.js"></script>
-
+    <script src="/static/js/tool.js"></script>
 </body>
 
 </html>

@@ -10,7 +10,7 @@ import random
 import copy
 import os
 
-from util.centerality import plot_k_curve, right_target_global_centrality_t
+from util.centrality import plot_k_curve, right_target_global_centrality_t
 
 plt.rcParams.update({'font.size': 17})
 
@@ -38,14 +38,6 @@ def getRanking(source_path, target_path, hormone = 'insulin', source_tissue='pan
         target_genes = list(pd.read_csv(target_path, header=None).iloc[:,0])
     except EmptyDataError:
         print("Files are empty or unable to read input csv files.")
-    
-    print("Input files loaded.")
-
-    print("Statistics of the ground truth data")
-    print("Number of genes: ", len(genes))
-    print("Number of target genes: ", len(target_genes))
-    print("Number of source genes: ", len(source_genes))
-    #print(genes)
 
     common_target_genes = np.intersect1d(genes, target_genes)
     common_source_genes = np.intersect1d(genes, source_genes)
@@ -78,7 +70,8 @@ def getRanking(source_path, target_path, hormone = 'insulin', source_tissue='pan
             A_SNAP[from_gene, to_gene] = 1
             A_SNAP[to_gene, from_gene] = 1
         except:
-            print("In skeletal muscle ", skeletal_muscle_df[i, 0], " or ", skeletal_muscle_df[i,1], " not present.")             
+            pass
+            # print("In skeletal muscle ", skeletal_muscle_df[i, 0], " or ", skeletal_muscle_df[i,1], " not present.")             
         
 
     for i in range(np.shape(pancreas_df)[0]):
@@ -89,7 +82,8 @@ def getRanking(source_path, target_path, hormone = 'insulin', source_tissue='pan
             A_SNAP[from_gene, to_gene] = 1
             A_SNAP[to_gene, from_gene] = 1
         except:
-            print("In pancreas ", pancreas_df[i, 0], " or ", pancreas_df[i,1], " not present.")  
+            pass
+            # print("In pancreas ", pancreas_df[i, 0], " or ", pancreas_df[i,1], " not present.")  
 
     A = np.zeros_like(corr_data.values)
     A_orig = corr_data.values + A_SNAP
