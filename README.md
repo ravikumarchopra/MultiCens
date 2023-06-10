@@ -13,5 +13,6 @@ Query-set centrality captures the effect of a node on a query-set of nodes prese
 
 Using Tool v2.0, We can measure the centrality scores for genes such as local centrality, global centrality, and query-set centrality by using gene expression data from GTex dataset or by providing your own gene expression data for Tissues.
 
-![Sample Output](https://github.com/ravikumarchopra/MultiCens/assets/9302741/9c02a4b3-969e-48dc-a158-1dd9630b8d37)
+![result2](https://github.com/ravikumarchopra/MultiCens/assets/9302741/741fcd61-c8c1-46ba-ba32-3ab4eca0dd48)
+
                        
