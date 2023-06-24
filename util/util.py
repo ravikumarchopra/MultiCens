@@ -1,15 +1,15 @@
-import json
 import os
 import re
+import json
 import gzip
+import time
+import asyncio
+import threading
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
-import concurrent.futures
-import multiprocessing as mp
 import statsmodels.api as sm
 from pyensembl import EnsemblRelease
-from joblib import Parallel, delayed
 from statsmodels.tools.tools import add_constant
 from sklearn.linear_model import LinearRegression
 
@@ -40,7 +40,6 @@ def get_gene_names(ensembl_gene_ids):
 
     return pd.DataFrame(gene_mapping)
 
-
 # Remove rows which does not have a SYMBOL
 def remove_extra_ensembl_ids(tissue_df, HGNC_gene_mapping):
     # Remove rows which does not have a SYMBOL
@@ -52,7 +51,6 @@ def remove_extra_ensembl_ids(tissue_df, HGNC_gene_mapping):
     merged_df.drop(columns=["GENEID", "SYMBOL"], inplace=True)
     return merged_df, symbols
 
-
 def add_column(tissue_incomplete, column_name):
     num_genes = tissue_incomplete.shape[0]
     random_vector = np.random.uniform(low=0.0001, high=0.00011, size=num_genes)
@@ -60,7 +58,6 @@ def add_column(tissue_incomplete, column_name):
     df[column_name] = random_vector
     tissue_complete = df.rename(columns={"random_vector": column_name})
     return tissue_complete.to_numpy()
-
 
 # Read gene expression data for a particular tssiue from GTEx data
 def get_tissue(tissue):
@@ -82,7 +79,6 @@ def get_tissue(tissue):
     gene_tpm = tissue_df.iloc[:, 5:].T
     gene_tpm.columns = headers
     return gene_tpm
-
 
 # Remove the effect of co-variates
 def rm_cov_effect(tissue_name, gene_tpm, cov_path):
@@ -124,11 +120,15 @@ def rm_cov_effect(tissue_name, gene_tpm, cov_path):
 
 # Create correlation matrix
 def create_corr_matrix(tissue_list, session_id):
+    start_time = time.time()
     n = len(tissue_list)
     tissue_names = "_".join(sorted([t["name"] for t in tissue_list]))
     output_path = os.path.join("uploads", session_id)
-    if os.path.exists( os.path.join(output_path, f"{tissue_names}.csv.gz")):
-        correlation_matrix = pd.read_csv(os.path.join(output_path, f"{tissue_names}.csv.gz"), compression="gzip")
+    corr_file_path = os.path.join(output_path, f"{tissue_names}.csv")
+    if os.path.exists(corr_file_path):
+        print("\n[Correlation matrix for selected tissues already exists.]")
+        print("\n[Loading correlation matrix...]")
+        correlation_matrix = pd.read_csv(corr_file_path)
         correlation_matrix = correlation_matrix.set_index(correlation_matrix.columns[0])
         with open(os.path.join(output_path, f"{tissue_names}.json"), 'r') as file:
             gene_count = json.loads(file.read())
@@ -138,7 +138,6 @@ def create_corr_matrix(tissue_list, session_id):
         print("\n[Reading gene expression data for each tissue]")
         print("-------------------------------------------------")
         for i in tqdm(range(n), total=n, desc="Tissues Processed: ", unit=" Tissue(s)"):
-            tissue_name = tissue_list[i]["name"]
             tissue = get_tissue(tissue_list[i])
             tissues.append(tissue)
             sample_ids.append(set(tissue.index))
@@ -146,33 +145,40 @@ def create_corr_matrix(tissue_list, session_id):
 
         common_samples = list(set.intersection(*sample_ids))
         common_genes = list(set.intersection(*genes))
+        print(f'\nCommon Samples: {len(common_samples)}')
+        print(f'\nCommon Genes: {len(common_genes)}')
         most_var_genes = set()
-
-        # Find 5000 most varying genes for each tissue
-        print("\n[Find 5000 most varying genes for each tissue]")
+        # Find 2000 most varying genes for each tissue
+        print("\n[Find 2000 most varying genes for each tissue]")
         print("-------------------------------------------------")
         for i in tqdm(range(n), total=n, desc="Tissues Processed: ", unit=" Tissue(s)"):
             # Select Common samples
             tissues[i] = tissues[i].loc[common_samples]
+            tissues[i] = tissues[i].loc[:, ~tissues[i].columns.duplicated()]
             # Select common genes
             tissues[i] = tissues[i][common_genes]
             # Calculate variances for tissue columns
             variances = np.var(tissues[i], axis=0)
-            # Sort source_variances in descending order and get the top 10000 indices
-            sorted_indices = np.argsort(variances)[::-1][:999]
-            # Get the corresponding column names from source_tissue
+            # Sort source_variances in descending order and get the top 2000 indices
+            sorted_indices = np.argsort(variances)[::-1][:2000]
             sorted_columns = tissues[i].columns[sorted_indices]
             most_var_genes.update(sorted_columns)
+            # print(len(sorted_columns))
         
+        most_var_genes = list(most_var_genes)
         gene_count = []
-
+        # Time calculation
+        end_time = time.time()
+        execution_time = end_time - start_time
+        execution_time = round(execution_time/60, 2)
+        time_taken = f'{execution_time} min(s)'
+        print("\nTime taken to find the common samples and genes and select top 2K genes from each tissue:", time_taken, "\n")
+        
         # Remove the effect of co-variates
         print("\n[Removing the effect of co-variates]")
         print("-------------------------------------------------")
-        # for i in tqdm(range(n), total=n, desc="Tissues Processed: ", unit=" Tissue(s)"):
+        start_time = time.time()
         for i in range(n):
-            # Select the union of (5000 most varying genes from each tissue) for each tissue
-            selected_genes = list(most_var_genes.intersection(tissues[i].columns))
             # Save gene list for a Tissue
             # genes = pd.DataFrame(tissues[i].columns)
             # genes.to_csv(
@@ -182,14 +188,23 @@ def create_corr_matrix(tissue_list, session_id):
             #     header=False,
             #     index=False,
             # )
-            tissues[i] = tissues[i][selected_genes]
+            # Select the union of (5000 most varying genes from each tissue) for each tissue
+            tissues[i] = tissues[i][most_var_genes]
             gene_count.append(len(tissues[i].columns))
             if tissue_list[i]["dataset"] == "GTex":
                 tissues[i] = rm_cov_effect(
                     tissue_list[i]["name"].capitalize(), tissues[i], tissue_list[i]["cov"]
                 )
             tissues[i].columns = [f"{gene}.{i+1}" for gene in tissues[i].columns]
-
+        
+        # Time calculation
+        end_time = time.time()
+        execution_time = end_time - start_time
+        execution_time = round(execution_time/60, 2)
+        time_taken = f'{execution_time} min(s)'
+        print("\nTime taken to remove the effect of covariates from each tissue:", time_taken, "\n")        
+        
+        start_time = time.time()
         # Concatenating tissues data horizontally
         tissues_df = pd.concat(tissues, axis=1, ignore_index=False)
 
@@ -205,16 +220,29 @@ def create_corr_matrix(tissue_list, session_id):
             )
         # Convert correlation score to absolute numbers
         correlation_matrix = correlation_matrix.abs()
+        
+        # Time calculation
+        end_time = time.time()
+        execution_time = end_time - start_time
+        execution_time = round(execution_time/60, 2)
+        time_taken = f'{execution_time} min(s)'
+        print("\nTime taken to concatenate the tissues horizontally and computing the correlation matrix:", time_taken, "\n")
+        
         # Saving correlation matrix to a csv file
         os.makedirs(output_path, exist_ok=True)
-        correlation_matrix.to_csv(
-            os.path.join(output_path, f"{tissue_names}.csv.gz"), compression="gzip"
-        )
-        with open(os.path.join(output_path, f"{tissue_names}.json"), 'w') as file:
-            json.dump(gene_count, file)
+        # asyncio.run(save_correlation_matrix_async(correlation_matrix, gene_count, output_path, tissue_names))
+        thread = threading.Thread(target=save_correlation_matrix_async, args=(correlation_matrix, gene_count, output_path, tissue_names))
+        thread.start()
 
     return correlation_matrix, gene_count
 
+def save_correlation_matrix_async(correlation_matrix, gene_count, output_path, tissue_names):
+    correlation_matrix.to_csv(
+            os.path.join(output_path, f"{tissue_names}.csv")
+        )
+    with open(os.path.join(output_path, f"{tissue_names}.json"), 'w') as file:
+            json.dump(gene_count, file)
+    print('[Correlation matrix saved.]')
 
 def allowed_file(filename):
     ALLOWED_EXTENSIONS = {"zip", "gz"}

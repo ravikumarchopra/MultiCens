@@ -10,7 +10,7 @@ import random
 import copy
 import os
 
-from util.centrality import plot_k_curve, right_target_global_centrality_t
+from util.centerality import plot_k_curve, right_target_global_centrality_t
 
 plt.rcParams.update({'font.size': 17})
 
@@ -20,24 +20,24 @@ def getRanking(source_path, target_path, hormone = 'insulin', source_tissue='pan
     Read correlation matrix
     The correlation matrix represents spearman correlation between every pair of genes in source and target tissue.
     """
-
+    print("\n[Reading correlation file ...]")
     corr_data = abs(pd.read_csv(f'data/{hormone}_eQTL_spearman_corr_matrix_with_snap_removed_CF_lt_R_latest_15k.csv'))
     #prob_data = pd.read_csv("../data/insulin_eQTL_spearman_prob_matrix_adj_removed_CF_lt_R_latest_10k.csv")
     
-    print("Correlation file loaded successfully.")
+    print("\n[Correlation file loaded successfully.]")
 
     n = int(int(corr_data.shape[0])/2)
 
     genes = list(corr_data.columns[:n])
     
-    print("Raeding input files ...")
+    print("\n[Raeding input files ...]")
     try:
         print(f'source path:{source_path}, {os.path.exists(source_path)}')
         print(f'target path:{target_path}, {os.path.exists(target_path)}')
         source_genes = list(pd.read_csv(source_path, header=None).iloc[:,0])
         target_genes = list(pd.read_csv(target_path, header=None).iloc[:,0])
     except EmptyDataError:
-        print("Files are empty or unable to read input csv files.")
+        print("\nFiles are empty or unable to read input csv files.")
 
     common_target_genes = np.intersect1d(genes, target_genes)
     common_source_genes = np.intersect1d(genes, source_genes)
@@ -53,8 +53,8 @@ def getRanking(source_path, target_path, hormone = 'insulin', source_tissue='pan
     print("Number of source genes present in the data: ", len(source_genes_indices))
 
     print(target_genes_indices)
-
-    SNAP_data = pd.read_csv("../data/SNAP_data/PPT-Ohmnet_gene_symbols.csv", index_col=0)
+    
+    SNAP_data = pd.read_csv("data/SNAP_data/PPT-Ohmnet_gene_symbols.csv", index_col=0)
     #SNAP_data
     pancreas_df = SNAP_data.loc[SNAP_data['tissue'] == source_tissue].values
     skeletal_muscle_df = SNAP_data.loc[SNAP_data['tissue'] == target_tissue].values
@@ -94,8 +94,11 @@ def getRanking(source_path, target_path, hormone = 'insulin', source_tissue='pan
 
     print("Swapping over")
     l,g = right_target_global_centrality_t(A, num_layers=2, target_tissue = 1, target_gene_indices = source_genes_indices, p=0.9)
-    plt.hist(g[:n], bins = 'auto')
+    # plt.hist(g[:n], bins = 'auto')
 
-    plot_df,results, filtered_results, lncRNA_results = plot_k_curve(genes, g, ground_truth_genes=common_target_genes, filtered=False, n=n)
-
-    return lncRNA_results
+    # plot_df,results, filtered_results, lncRNA_results = plot_k_curve(genes, g, ground_truth_genes=common_target_genes, filtered=False, n=n)
+    result = pd.DataFrame()
+    result['Gene Name'] = genes
+    result['Centrality'] = g[:n]
+    
+    return result

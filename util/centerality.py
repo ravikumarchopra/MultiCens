@@ -53,19 +53,19 @@ def right_new_local_centrality_st(A_tilde_full, num_layers, target_tissue, targe
     current_angle = np.zeros(3,)
     print("local centrality computation starts")
     while(count<200):
-        print(count)
+        # print(count)
         count = count + 1
         l_new = (p* ((A_tilde).dot(l))) + (1-p)*ones_t
         current_angle[0] = current_angle[1]
         current_angle[1] = current_angle[2]
         current_angle[2] = angle_between(l, l_new)
-        print(current_angle)
+        # print(current_angle)
         if(((current_angle[0] == current_angle[1]) and (current_angle[1] == current_angle[2])) or (current_angle[2] == 0)):
             break
         l = copy.deepcopy(l_new)
         #l = copy.deepcopy(l_new)/LA.norm(l_new)
     print("l values")
-    print(l)
+    # print(l)
     #new_l = l/l.sum()# + l_tt/l_tt.sum()
     new_l = copy.deepcopy(l)
     if target_tissue == 0:
@@ -77,7 +77,7 @@ def right_new_local_centrality_st(A_tilde_full, num_layers, target_tissue, targe
     else:
         print("invalid target tissue")
     print("Target genes")
-    print(target_gene_indices)
+    # print(target_gene_indices)
     return new_l
 
 def right_target_global_centrality_t(A_tilde_full, num_layers, target_tissue, target_gene_indices, p):
@@ -86,9 +86,9 @@ def right_target_global_centrality_t(A_tilde_full, num_layers, target_tissue, ta
     A_tilde = A_tilde_full/np.sum(A_tilde_full, axis=0)
     N = int(np.shape(A_tilde)[0])
     n = int(N/num_layers)
-    print("A_tilde sums")
-    print(np.sum(A_tilde[0,:]))
-    print(np.sum(A_tilde[:,0]))
+    # print("A_tilde sums")
+    # print(np.sum(A_tilde[0,:]))
+    # print(np.sum(A_tilde[:,0]))
         
     A = np.zeros_like(A_tilde_full, dtype=np.float32)
     C = np.zeros_like(A_tilde_full, dtype=np.float32)
@@ -114,14 +114,14 @@ def right_target_global_centrality_t(A_tilde_full, num_layers, target_tissue, ta
         current_angle[0] = current_angle[1]
         current_angle[1] = current_angle[2]
         current_angle[2] = angle_between(g, g_new)
-        print(current_angle)
+        # print(current_angle)
         if(((current_angle[0] == current_angle[1]) and (current_angle[1] == current_angle[2])) or (current_angle[2] == 0)):
             break
         g = copy.deepcopy(g_new)
         #g = copy.deepcopy(g_new)/LA.norm(g_new)
         counter+=1
-        print(counter)
-        print(np.sum(g))
+        # print(counter)
+        # print(np.sum(g))
     new_g = copy.deepcopy(g)
     if target_tissue == 1:
         print("Found target set centrality")
@@ -135,7 +135,7 @@ def right_target_global_centrality_t(A_tilde_full, num_layers, target_tissue, ta
 
 
 def plot_k_curve(genes, cen_vector, ground_truth_genes, filtered,n):
-    secreted_proteins = list(pd.read_csv("../data/002790_proteins.csv", header=None).values)
+    secreted_proteins = list(pd.read_csv("data/002790_proteins.csv", header=None).values)
     secreted_proteins = [s[0].upper() for s in secreted_proteins]
     order = cen_vector[:n].argsort()
     ranks = order.argsort()
@@ -184,7 +184,7 @@ def plot_k_curve(genes, cen_vector, ground_truth_genes, filtered,n):
 
 
     #get lncRNAs ranking
-    lncRNAs = list(np.load("../data/paper/lncRNAs.npy"))
+    lncRNAs = list(np.load("data/paper/lncRNAs.npy"))
     lncRNA_results = results[results.gene_name.isin(lncRNAs)]
     lncRNA_ranked_genes = lncRNA_results['gene_name'].tolist()
 

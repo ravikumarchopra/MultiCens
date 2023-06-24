@@ -1,3 +1,4 @@
+import time
 from matplotlib import pyplot as plt
 import seaborn as sns
 import pandas as pd
@@ -28,6 +29,7 @@ def angle_between(v1, v2):
 # MultiCens: local centrality
 def local_centrality(A_tilde_full, num_layers, p):
     print("\n[Computing Local Centrality]\n")
+    start_time = time.time()
     A_tilde_full = A_tilde_full / np.sum(A_tilde_full, axis=0)
     # A_tilde_full = A_tilde_full/LA.norm(A_tilde_full)
     n = int(np.shape(A_tilde_full)[0] / num_layers)
@@ -69,12 +71,22 @@ def local_centrality(A_tilde_full, num_layers, p):
         l[(i * n) : ((i + 1) * n)] = (
             l[(i * n) : ((i + 1) * n)] / l[(i * n) : ((i + 1) * n)].sum()
         )
-
-    return np.round(new_l / np.max(new_l), 2)
+    
+    new_l = new_l / np.max(new_l)
+    
+    # Time calculation
+    end_time = time.time()
+    execution_time = end_time - start_time
+    execution_time = round(execution_time/60, 2)
+    time_taken = f'{execution_time} min(s)'
+    print("\nTime taken to compute the local centrality scores:", time_taken, "\n")
+    return new_l
 
 
 # MultiCens: global centrality
 def global_centrality(A_tilde_full, num_layers, p):
+    print("\n[Computing Global Centrality]\n")
+    start_time = time.time()
     l = local_centrality(A_tilde_full, num_layers, p)  # last checkpoint
     # A_tilde = copy.deepcopy(A_tilde_full)
     A_tilde = A_tilde_full / np.sum(A_tilde_full, axis=0)
@@ -95,8 +107,6 @@ def global_centrality(A_tilde_full, num_layers, p):
         A_tilde[(3 * n) : (4 * n), (3 * n) : (4 * n)]
     )
     C = A_tilde - A
-
-    print("\n[Computing Global Centrality]\n")
 
     ones_t = np.ones((N,)) / N
     g = copy.deepcopy(ones_t)
@@ -126,7 +136,17 @@ def global_centrality(A_tilde_full, num_layers, p):
     g_fresh = copy.deepcopy(g)
     new_g = new_g / new_g.sum()
     g_fresh = g_fresh / g_fresh.sum()
-    return np.round(new_g / np.max(new_g), 2)
+    
+    new_g = new_g / np.max(new_g)
+    
+    # Time calculation
+    end_time = time.time()
+    execution_time = end_time - start_time
+    execution_time = round(execution_time/60, 2)
+    time_taken = f'{execution_time} min(s)'
+    print("\nTime taken to compute the global centrality scores:", time_taken, "\n")
+    
+    return new_g
 
 
 def right_new_local_centrality_st(
@@ -142,23 +162,29 @@ def right_new_local_centrality_st(
     N = int(np.shape(A_tilde_full)[0])
     A_tilde = np.zeros_like(A_tilde_full, dtype=np.float32)
 
-    if target_tissue == 1:
-        A_tilde[n:,n:] = A_tilde_full[n:,n:]
-    elif target_tissue == 0:
-        A_tilde[:n,:n] = A_tilde_full[:n,:n]
-    else:
-        print("wrong target tissue")
+    # if target_tissue == 1:
+    #     A_tilde[n:,n:] = A_tilde_full[n:,n:]
+    # elif target_tissue == 0:
+    #     A_tilde[:n,:n] = A_tilde_full[:n,:n]
+    # else:
+    #     print("wrong target tissue")
 
-    # A_tilde[start:end, start:end] = A_tilde_full[start:end, start:end] # replacement for above commented code
-    
-    
+    A_tilde[start:end, start:end] = A_tilde_full[
+        start:end, start:end
+    ]  # replacement for above commented code
+
     np.fill_diagonal(A_tilde, 0.0)
     # A_tilde = A_tilde/LA.norm(A_tilde)
 
     ones_t = np.zeros((N,))
-    ones_t[
-        (np.asarray(target_gene_indices, dtype=np.int32) + int(n * target_tissue))
-    ] = 1 / len(target_gene_indices)
+    # ones_t[
+    #     (np.asarray(target_gene_indices, dtype=np.int32) + int(n * target_tissue))
+    # ] = 1 / len(target_gene_indices)
+
+    ones_t[np.asarray(target_gene_indices, dtype=np.int32)] = 1 / len(
+        target_gene_indices
+    )  # replacement for above commented code
+
     l = np.copy(ones_t)
     l_new = np.copy(ones_t)
 
@@ -166,7 +192,7 @@ def right_new_local_centrality_st(
     current_angle = np.zeros(
         3,
     )
-    print("local centrality computation starts")
+    print("[Local Centrality computation starts]")
     while count < 200:
         # print(count)
         count = count + 1
@@ -186,17 +212,19 @@ def right_new_local_centrality_st(
     # print(l)
     # new_l = l/l.sum()# + l_tt/l_tt.sum()
     new_l = copy.deepcopy(l)
-    if target_tissue == 0:
-        print("Found local centrality for target set centrality")
-        new_l[:n] = l[:n] / l[:n].sum()
-    elif target_tissue == 1:
-        new_l[n:] = l[n:] / l[n:].sum()
-        print("Found local centrality for source set centrality")
-    else:
-        print("invalid target tissue")
-    
-    # new_l[start:end] = l[start:end] / l[start:end].sum() # replacement for above commented code
-    
+    # if target_tissue == 0:
+    #     print("Found local centrality for target set centrality")
+    #     new_l[:n] = l[:n] / l[:n].sum()
+    # elif target_tissue == 1:
+    #     new_l[n:] = l[n:] / l[n:].sum()
+    #     print("Found local centrality for source set centrality")
+    # else:
+    #     print("invalid target tissue")
+
+    new_l[start:end] = (
+        l[start:end] / l[start:end].sum()
+    )  # replacement for above commented code
+
     # print("Target genes")
     # print(target_gene_indices)
     return new_l
@@ -205,30 +233,46 @@ def right_new_local_centrality_st(
 def right_target_global_centrality_t(
     A_tilde_full, num_layers, target_tissue, target_gene_indices, start, end, p
 ):
+    print("\n[Computing Query-set Centrality]\n")
+    start_time = time.time()
     l = right_new_local_centrality_st(
         A_tilde_full, num_layers, target_tissue, target_gene_indices, start, end, p
     )  # last checkpoint
     # A_tilde = copy.deepcopy(A_tilde_full)
     A_tilde = A_tilde_full / np.sum(A_tilde_full, axis=0)
-    N = int(np.shape(A_tilde)[0])
-    n = int(N / num_layers)
+    N = int(np.shape(A_tilde)[0]) # rows in correlation matrix
+    n = int(N / num_layers) # number of genes selected from each tissue
     # print("A_tilde sums")
     # print(np.sum(A_tilde[0, :]))
     # print(np.sum(A_tilde[:, 0]))
 
     A = np.zeros_like(A_tilde_full, dtype=np.float32)
     C = np.zeros_like(A_tilde_full, dtype=np.float32)
-    A[:n, :n] = copy.deepcopy(A_tilde[:n, :n])
-    A[n:, n:] = copy.deepcopy(A_tilde[n:, n:])
-    C[:n, n:] = copy.deepcopy(A_tilde[:n, n:])
-    C[n:, :n] = copy.deepcopy(A_tilde[n:, :n])
+    # A[:n, :n] = copy.deepcopy(A_tilde[:n, :n])
+    # A[n:, n:] = copy.deepcopy(A_tilde[n:, n:])
+    # C[:n, n:] = copy.deepcopy(A_tilde[:n, n:])
+    # C[n:, :n] = copy.deepcopy(A_tilde[n:, :n])
+    
+    # replacement for above commented code
+    # N is the number of sub-matrices
+    # n size of each sub-matrix
+    for i in range(num_layers):
+        for j in range(num_layers):
+            if i == j:
+                A[i*n:(i+1)*n, j*n:(j+1)*n] = copy.deepcopy(A_tilde[i*n:(i+1)*n, j*n:(j+1)*n])
+            else:
+                C[i*n:(i+1)*n, j*n:(j+1)*n] = copy.deepcopy(A_tilde[i*n:(i+1)*n, j*n:(j+1)*n])
 
-    print(f"[Finding source global centrality for layer {str(target_tissue)}]")
+    print(f"[Finding target global centrality for layer {str(target_tissue+1)}]")
 
     ones_t = np.zeros((N,))
-    ones_t[
-        (np.asarray(target_gene_indices, dtype=np.int32) + int(n * target_tissue))
-    ] = 1 / len(target_gene_indices)
+    # ones_t[
+    #     (np.asarray(target_gene_indices, dtype=np.int32) + int(n * target_tissue))
+    # ] = 1 / len(target_gene_indices)
+
+    ones_t[np.asarray(target_gene_indices, dtype=np.int32)] = 1 / len(
+        target_gene_indices
+    )  # replacement for above commented code
     g = copy.deepcopy(ones_t)
     g_new = copy.deepcopy(ones_t)
 
@@ -254,16 +298,26 @@ def right_target_global_centrality_t(
         # print(counter)
         # print(np.sum(g))
     new_g = copy.deepcopy(g)
-    if target_tissue == 1:
-        print("Found target set centrality")
-        new_g[:n] = g[:n] / g[:n].max()
-    elif target_tissue == 0:
-        new_g[n:] = g[n:] / g[n:].max()
-        print("Found source set centrality")
-    else:
-        print("invalid target tissue")
+    # if target_tissue == 1:
+    #     print("Found target set centrality")
+    #     new_g[:n] = g[:n] / g[:n].max()
+    # elif target_tissue == 0:
+    #     new_g[n:] = g[n:] / g[n:].max()
+    #     print("Found source set centrality")
+    # else:
+    #     print("invalid target tissue")
+
+    new_g[start:end] = (
+        g[start:end] / g[start:end].max()
+    )  # replacement for above commented code
     
-    # new_g[start:end] = g[start:end] / g[start:end].sum() # replacement for above commented code
+     # Time calculation
+    end_time = time.time()
+    execution_time = end_time - start_time
+    execution_time = round(execution_time/60, 2)
+    time_taken = f'{execution_time} min(s)'
+    print("\nTime taken to compute the query-set centrality scores:", time_taken, "\n")
+    
     return l, new_g
 
 

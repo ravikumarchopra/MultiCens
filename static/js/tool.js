@@ -190,7 +190,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   var runSampleButton = document.getElementById("example-run");
 
-  var message = "Please wait! It may take 2 minutes/Tissue  ...";
+  var message = "Please wait! It may take 3-5 minutes/Tissue  ...";
 
   runSampleButton.onclick = function (event) {
     loadSampleData();
@@ -556,13 +556,13 @@ function loadSampleData() {
   gList = [];
   files = [];
   gList.push({
-    name: 'Pancreas',
+    name: 'Muscle',
     dataset: 'GTex',
     file: "-",
     checked: true
   });
   gList.push({
-    name: 'Muscle',
+    name: 'Pancreas',
     dataset: 'GTex',
     file: "-",
     checked: true

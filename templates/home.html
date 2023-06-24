@@ -88,7 +88,7 @@
         </div>
     </div>
 
-    <!-- Nav tabs -->
+    <!-- Nav tabs -->   
     <ul class="nav nav-tabs m-4">
         <li class="nav-item">
             <a class="nav-link active" data-bs-toggle="tab" href="#home"><i class="fa fa-home"></i> Home</a>
@@ -98,8 +98,7 @@
         </li>
         <li class="nav-item">
             <a class="nav-link" data-bs-toggle="tab" href="#tool-beta"><i class="fa fa-screwdriver-wrench"></i> Tool
-                v2.0
-                (beta)</a>
+                v2.0</a>
         </li>
         <li class="nav-item">
             <a class="nav-link" data-bs-toggle="tab" href="#help"><i class="fa fa-circle-question"></i> Help</a>
@@ -172,21 +171,22 @@
                         margin-right: auto;
                         display: block;
                         " src="static/img/result1.png" alt="Sample Output for Tool v1.0" /><br />
-                    <h5>Tool v2.0 (beta)</h5>
+                    <h5>Tool v2.0</h5>
                     <p class="text-justify">
                         Using <strong>Tool v2.0</strong>, We can measure the centrality scores for genes such as
                         <strong><dfn>local centrality</dfn></strong>, <strong><dfn>global
                                 centrality</dfn></strong>, and <strong><dfn>query-set centrality</dfn></strong> by using
-                        gene expression data from <a href="https://gtexportal.org/home/">GTex</a> dataset or by providing your own gene expression
+                        gene expression data from <a href="https://gtexportal.org/home/">GTex</a> dataset or by
+                        providing your own gene expression
                         data for Tissues.<br /><br />
                     </p>
-                    <h6 style="text-align: center;">Sample Output for Tool v2.0 (beta)</h6>
+                    <h6 style="text-align: center;">Sample Output for Tool v2.0</h6>
                     <img style="
                         width: 60%;
                         margin-left: auto;
                         margin-right: auto;
                         display: block;
-                        " src="static/img/result2.png" alt="Sample Output for Tool v2.0 (beta)" />
+                        " src="static/img/result2.png" alt="Sample Output for Tool v2.0" />
                     <br /><br />
                     <strong>For more details please switch to the <dfn>Help</dfn> tab Or You
                         can contact us by switching to the <dfn>Contact</dfn> tab.</strong>
@@ -197,9 +197,8 @@
                 <h5 class="card-header">References</h5>
                 <div class="card-body">
                     <p>
-                        Kumar, Tarun, et al. "<dfn>MultiCens</dfn> Multilayer network
-                        centrality measures to uncover molecular mediators of
-                        tissue-tissue communication." bioRxiv (2022).
+                        Kumar, Tarun, et al. "MultiCens: Multilayer network centrality measures to uncover molecular
+                        mediators of tissue-tissue communication." PLOS Computational Biology 19.4 (2023): e1011022.
                     </p>
                 </div>
             </div>
@@ -330,6 +329,14 @@
                         </div>
                         <!-- Add Tissue -->
                         <div class="row">
+                            <div class="col-md-3">
+                                <label for="global-dataset" class="form-label">Select Dataset</label>
+                                <select class="form-select" id="global-dataset" name="global-dataset" required>
+                                    {% for dataset in dataset_list %}
+                                    <option value="{{dataset}}">{{dataset}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
                             <div class="col-md-3 mb-3">
                                 <label for="global-tissue" class="form-label">Select Tissue Name</label>
                                 <input type="text" list="tissues" class="form-control" id="global-tissue"
@@ -343,14 +350,6 @@
                                 <div class="invalid-feedback" id="invalid-tissue">
                                     Please enter or select a tissue name.
                                 </div>
-                            </div>
-                            <div class="col-md-3">
-                                <label for="global-dataset" class="form-label">Select Dataset</label>
-                                <select class="form-select" id="global-dataset" name="global-dataset" required>
-                                    {% for dataset in dataset_list %}
-                                    <option value="{{dataset}}">{{dataset}}</option>
-                                    {% endfor %}
-                                </select>
                             </div>
                             <div class="col-md-4">
                                 <label for="global-file" class="form-label">Select Gene Expression Data File</label>
@@ -551,7 +550,7 @@
                         genes.</a>
                 </div>
             </div>
-            <h4>Tool v2.0 (beta)</h4>
+            <h4>Tool v2.0</h4>
             <div class="card">
                 <h5 class="card-header">Form fields</h5>
                 <div class="card-body">
@@ -613,6 +612,12 @@
                                         </div>
                                     </li>
                                 </ol>
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">Query Tissue Name</div>
+                                The tissue name corresponding to the gene query set.
                             </div>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-start">
